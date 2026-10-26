@@ -18,7 +18,7 @@ Editor y generador de facturas en el navegador. No necesita servidor ni instalac
 
 **Datos del negocio**: logo (se convierte a blanco y negro al subirlo y reemplaza al nombre
 comercial en la cabecera de la factura; el nombre sigue saliendo al pie), nombre comercial, razón social, domicilio comercial, CUIT, punto de venta
-(por defecto `00001`), número de comprobante (arranca en `00000001`) y, en *Otros datos*,
+(por defecto `00079`), número de comprobante (arranca en `00028711` y sube de a uno) y, en *Otros datos*,
 condición frente al IVA (por defecto IVA Responsable Inscripto), ingresos brutos, inicio de actividades y referencia comercial.
 La fecha de emisión es siempre la del día y no se puede cambiar.
 El CUIT se controla al escribirlo: tienen que ser 11 dígitos y el verificador tiene que cerrar.

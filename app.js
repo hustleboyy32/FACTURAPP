@@ -3,8 +3,10 @@
   'use strict';
 
   const STORAGE_KEY = 'facturapp.estado';
-  const COMP_NRO_INICIAL = 1;
-  const PUNTO_VENTA_INICIAL = '00001';
+  const COMP_NRO_INICIAL = 28711;
+  const PUNTO_VENTA_INICIAL = '00079';
+  const COMP_NRO_VIEJO = 1;
+  const PUNTO_VENTA_VIEJO = 1;
   const ALICUOTA_IVA = 21;
   // Datos fiscales que venía cargando la plantilla. Si siguen intactos y el negocio
   // no tiene identidad propia, se descartan al abrir.
@@ -44,6 +46,7 @@
   }
 
   let migrarPlantilla = false;
+  let migrarNumeracion = false;
   let avisoStorage = false;
   let estado = cargar();
   let copiaVista = 'ORIGINAL'; // la copia que se muestra en la vista previa
@@ -71,11 +74,16 @@
         negocio.iibb = '';
         negocio.inicio = '';
       }
+      const puntoGuardado = String(g.puntoVenta ?? '').replace(/\D/g, '');
+      const compGuardado = Number(g.compNro);
+      const puntoViejo = !puntoGuardado || Number(puntoGuardado) === PUNTO_VENTA_VIEJO;
+      const compViejo = !Number.isFinite(compGuardado) || compGuardado === COMP_NRO_VIEJO || compGuardado === 0;
+      if (puntoViejo || compViejo) migrarNumeracion = true;
       return {
         ...base, ...g,
         negocio,
-        puntoVenta: plantillaVieja ? base.puntoVenta : (g.puntoVenta ?? base.puntoVenta),
-        compNro: plantillaVieja ? base.compNro : (Number.isFinite(Number(g.compNro)) ? Number(g.compNro) : base.compNro),
+        puntoVenta: (plantillaVieja || puntoViejo) ? base.puntoVenta : puntoGuardado,
+        compNro: (plantillaVieja || compViejo) ? base.compNro : compGuardado,
         cliente: { ...base.cliente, ...(g.cliente || {}) },
         copias: { ...base.copias, ...(g.copias || {}) },
         items: Array.isArray(g.items) && g.items.length ? g.items : base.items,
@@ -95,7 +103,7 @@
       return false;
     }
   }
-  if (migrarPlantilla) guardar();
+  if (migrarPlantilla || migrarNumeracion) guardar();
 
   // ---------- formato ----------
   const hoyISO = () => {
