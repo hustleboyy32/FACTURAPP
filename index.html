@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>FacturApp</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css?v=8">
+</head>
+<body>
+
+<!-- ===================== PANEL DE EDICIÓN ===================== -->
+<aside class="panel no-print">
+  <header class="panel-head">
+    <div class="logo">
+      <span class="logo-mark">F</span>
+      <div>
+        <div class="logo-name">FacturApp</div>
+        <div class="logo-sub">Editor de facturas</div>
+      </div>
+    </div>
+    <div class="status">
+      <span class="chip chip-num"><small>Comprobante</small><b><span id="chipPv"></span>-<span id="chipNro"></span></b></span>
+      <span class="chip"><small>Fecha</small><b id="chipFecha"></b></span>
+    </div>
+  </header>
+
+  <div class="panel-body">
+
+    <section class="card">
+      <h2><i class="ico">🏪</i> Mi negocio</h2>
+      <div class="field">
+        <label>Logo <small class="help">se convierte a blanco y negro y reemplaza al nombre en la factura</small></label>
+        <div class="logo-upload" id="logoUpload">
+          <img id="logoPreview" alt="" hidden>
+          <div class="logo-empty" id="logoEmpty">
+            <span class="logo-plus">+</span>
+            <span>Subir logo</span>
+            <small>PNG, JPG o SVG</small>
+          </div>
+          <div class="logo-actions" id="logoActions" hidden>
+            <button type="button" class="mini" id="logoCambiar">Cambiar</button>
+            <button type="button" class="mini danger" id="logoQuitar">Quitar</button>
+          </div>
+          <input type="file" id="logoFile" accept="image/*" hidden>
+        </div>
+      </div>
+      <div class="field"><label for="negocioNombre">Nombre comercial</label><input id="negocioNombre" placeholder="Ej: Mi Comercio"></div>
+      <div class="field"><label for="negocioRazon">Razón social</label><input id="negocioRazon" placeholder="Apellido y nombre / Razón social"></div>
+      <div class="field"><label for="negocioDomicilio">Domicilio comercial</label><input id="negocioDomicilio" placeholder="Calle 123 - Barrio, Ciudad"></div>
+      <div class="field"><label for="negocioCuit">CUIT</label><input id="negocioCuit" inputmode="numeric" placeholder="20123456789" aria-describedby="errNegocioCuit"><small class="field-error" id="errNegocioCuit" hidden></small></div>
+      <div class="grid-3">
+        <div class="field"><label for="puntoVenta">Punto de venta</label><input id="puntoVenta" inputmode="numeric" maxlength="5" placeholder="1"></div>
+        <div class="field"><label for="compNro">Comp. Nro</label><input id="compNro" inputmode="numeric" maxlength="8" placeholder="1"></div>
+        <div class="field"><label for="fechaEmision">Fecha de emisión</label><input id="fechaEmision" type="date" readonly tabindex="-1" aria-readonly="true" title="Siempre es la fecha del día"></div>
+      </div>
+      <details class="more">
+        <summary>Otros datos del negocio</summary>
+        <div class="field"><label for="negocioIva">Condición frente al IVA</label><input id="negocioIva"></div>
+        <div class="grid-2">
+          <div class="field"><label for="negocioIibb">Ingresos Brutos</label><input id="negocioIibb" inputmode="numeric"></div>
+          <div class="field"><label for="negocioInicio">Inicio de actividades</label><input id="negocioInicio" type="date"></div>
+        </div>
+        <div class="field"><label for="negocioRef">Referencia comercial</label><input id="negocioRef"></div>
+      </details>
+    </section>
+
+    <section class="card">
+      <h2><i class="ico">👤</i> Cliente <span class="tag">Consumidor Final</span></h2>
+      <div class="field"><label for="clienteCuit">CUIT del cliente</label><input id="clienteCuit" inputmode="numeric" placeholder="20123456789" aria-describedby="errClienteCuit"><small class="field-error" id="errClienteCuit" hidden></small></div>
+      <div class="field"><label for="clienteNombre">Apellido y nombre / Razón social</label><input id="clienteNombre"></div>
+      <div class="field"><label for="clienteDomicilio">Domicilio</label><input id="clienteDomicilio"></div>
+      <div class="field"><label for="clienteCondVenta">Condición de venta</label>
+        <input id="clienteCondVenta" list="condVentaList" placeholder="Ej: Transferencia Bancaria">
+        <datalist id="condVentaList">
+          <option value="Contado">
+          <option value="Transferencia Bancaria">
+          <option value="Tarjeta de Débito">
+          <option value="Tarjeta de Crédito">
+          <option value="Cuenta Corriente">
+        </datalist>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2><i class="ico">🧾</i> Productos / Servicios</h2>
+      <div id="itemsEditor"></div>
+      <button type="button" class="btn ghost" id="addItem">+ Agregar producto</button>
+      <div class="total-line"><span>Importe total</span><b>$ <span id="eTotal">0,00</span></b></div>
+      <p class="bonif-line" id="eBonifLine" hidden></p>
+      <p class="iva-line" id="eIvaLine">IVA contenido (21%): $ <span id="eIva">0,00</span></p>
+    </section>
+
+    <section class="card">
+      <h2><i class="ico">🔏</i> Autorización ARCA</h2>
+      <div class="grid-2">
+        <div class="field"><label for="cae">CAE N°</label><input id="cae" inputmode="numeric" maxlength="14" placeholder="14 dígitos"></div>
+        <div class="field"><label for="caeVto">Vto. del CAE</label><input id="caeVto" type="date"></div>
+      </div>
+      <p class="field-note">El CAE y el vencimiento salen en el pie, como en el comprobante de ARCA.</p>
+    </section>
+
+    <section class="card">
+      <h2><i class="ico">🖨️</i> Copias a generar</h2>
+      <div class="copies">
+        <label class="copy on locked"><input type="checkbox" checked disabled> <span>Original</span><small>siempre</small></label>
+        <label class="copy"><input type="checkbox" id="copiaDuplicado"> <span>Duplicado</span><small>página 2</small></label>
+        <label class="copy"><input type="checkbox" id="copiaTriplicado"> <span>Triplicado</span><small>página 3</small></label>
+      </div>
+    </section>
+
+  </div>
+
+  <footer class="panel-foot">
+    <button type="button" class="btn primary" id="generar">Generar PDF <span class="pages" id="pagesHint">1 página</span></button>
+    <button type="button" class="btn secondary" id="nuevaFactura">Nueva factura</button>
+    <p class="hint">Se abre el diálogo de impresión: elegí <b>Guardar como PDF</b>. "Nueva factura" pasa al número siguiente y limpia cliente y productos.</p>
+  </footer>
+</aside>
+
+<!-- ===================== VISTA PREVIA / FACTURA ===================== -->
+<main class="sheet-wrap">
+  <div class="preview-bar no-print">
+    <span>Vista previa</span>
+    <div class="seg" id="segCopias">
+      <button type="button" class="active" data-copia="ORIGINAL">Original</button>
+      <button type="button" data-copia="DUPLICADO">Duplicado</button>
+      <button type="button" data-copia="TRIPLICADO">Triplicado</button>
+    </div>
+  </div>
+
+  <div id="copias">
+  <div class="sheet" id="factura">
+
+    <header class="box emisor">
+      <div class="copia" data-copia-label>ORIGINAL</div>
+      <div class="head-main">
+        <div class="letter-box">
+          <div class="letter">B</div>
+          <div class="cod">COD. 006</div>
+        </div>
+        <div class="vsplit"></div>
+        <div class="h-left">
+          <div class="brand" data-brand>
+            <img class="brand-logo" data-logo alt="">
+            <span data-f="negocio.nombre"></span>
+          </div>
+          <div class="h-fields">
+            <p><b>Razón Social:</b> <span data-f="negocio.razon"></span></p>
+            <p><b>Domicilio Comercial:</b> <span data-f="negocio.domicilio"></span></p>
+            <p><b>Condición frente al IVA:</b> <b data-f="negocio.iva"></b></p>
+          </div>
+        </div>
+        <div class="h-right">
+          <div class="title">FACTURA</div>
+          <div class="h-fields">
+            <p class="pvline"><b>Punto de Venta:</b> <b class="big" data-f="puntoVenta"></b> <b class="comp">Comp. Nro:</b> <b class="big" data-f="compNro"></b></p>
+            <p><b>Fecha de Emisión:</b> <b class="big" data-f="fecha"></b></p>
+            <p class="gap"><b>CUIT:</b> <span data-f="negocio.cuit"></span></p>
+            <p><b>Ingresos Brutos:</b> <span data-f="negocio.iibb"></span></p>
+            <p><b>Fecha de Inicio de Actividades:</b> <span data-f="negocio.inicio"></span></p>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <section class="box cliente">
+      <p class="cuit"><b>CUIT:</b> <span data-f="cliente.cuit"></span></p>
+      <p class="c-nombre"><b>Apellido y Nombre / Razón Social:</b> <span data-f="cliente.nombre"></span></p>
+      <p class="c-iva"><b>Condición frente al IVA:</b> <span>Consumidor Final</span></p>
+      <p class="c-dom"><b>Domicilio:</b> <span data-f="cliente.domicilio"></span></p>
+      <p class="c-venta"><b>Condición de venta:</b> <span data-f="cliente.condVenta"></span></p>
+    </section>
+
+    <div class="ref"><b>Referencia Comercial:</b> <span data-f="negocio.ref"></span></div>
+
+    <div class="items">
+      <table>
+        <colgroup>
+          <col class="col-cod"><col class="col-prod"><col class="col-cant"><col class="col-um">
+          <col class="col-pu"><col class="col-bonif"><col class="col-imp"><col class="col-sub">
+        </colgroup>
+        <thead>
+          <tr>
+            <th>Código</th>
+            <th>Producto / Servicio</th>
+            <th>Cantidad</th>
+            <th>U. Medida</th>
+            <th>Precio Unit.</th>
+            <th>% Bonif</th>
+            <th>Imp. Bonif.</th>
+            <th>Subtotal</th>
+          </tr>
+        </thead>
+        <tbody data-items></tbody>
+      </table>
+    </div>
+
+    <section class="box totals">
+      <p class="formula" data-formula hidden><span data-f="formula"></span></p>
+      <p><b>Subtotal: $</b><span class="val" data-f="subtotal"></span></p>
+      <p><b>Importe Otros Tributos: $</b><span class="val">0,00</span></p>
+      <p class="total"><b>Importe Total: $</b><span class="val" data-f="total"></span></p>
+    </section>
+
+    <section class="box regimen">
+      <div class="regimen-title">Régimen de Transparencia Fiscal al Consumidor (Ley 27.743)</div>
+      <p class="iva"><b>IVA Contenido: $</b> <span data-f="ivaContenido"></span></p>
+    </section>
+
+    <div class="footer-brand" data-f="negocio.nombre"></div>
+
+    <footer class="auth">
+      <div class="qr-slot"><img src="qr-arca.png" alt="" width="106" height="106"></div>
+      <img class="arca-logo" src="arca-logo.png" alt="ARCA">
+      <div class="auth-title">Comprobante Autorizado</div>
+      <div class="auth-note">Esta Agencia no se responsabiliza por los datos ingresados en el detalle de la operación</div>
+      <div class="cae-block">
+        <p><b>CAE N°:</b><span data-f="cae"></span></p>
+        <p><b>Fecha de Vto. de CAE:</b><span data-f="caeVto"></span></p>
+      </div>
+      <div class="pag">Pág. 1/1</div>
+    </footer>
+  </div>
+  </div>
+</main>
+
+<script src="app.js"></script>
+</body>
+</html>
